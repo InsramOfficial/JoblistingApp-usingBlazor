@@ -1,0 +1,57 @@
+﻿@page "/Admin/CreateTestamonials"
+@using joblistingsite.Components.Layout
+@using joblistingsite.Data
+@using joblistingsite.Models
+
+@rendermode InteractiveServer
+@inject AppDbContext db 
+@inject NavigationManager navigationManager
+@layout AdminLayout
+
+<div class="row justify-content-center">
+    <div class="col-6 d-flex justfiy-conetent-center">
+        <h3>Create Category</h3>
+    </div>
+    <div class="col-8 d-flex justify-content-center">
+        <EditForm FormName="CreateTestamonials" Model="Testamonials" Enhance=true OnValidSubmit="CreateTestamonial">
+            <div class="col-6">
+                <label class="form-label">Name:</label>
+                <InputText class="form-control" @bind-Value="Testamonials.Name"/>
+
+            </div>
+            <div class="col-6">
+                <label class="form-label">Occupation:</label>
+                <InputText class="form-control" @bind-Value="Testamonials.Occupation"/>
+
+            </div>
+
+            <div class="col-6">
+                <label class="form-label">Review:</label>
+                <InputTextArea class="form-control" @bind-Value="Testamonials.Review" />
+
+            </div>
+
+            @* <div class="col-6">  *@
+            @*     <label class="form-label">Image:</label> *@
+
+            @*   <input class="form-control" @bind-Value="Testamonials.Photo" /> *@
+
+            @* </div> *@
+            <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+
+    public Testamonials Testamonials { get; set; } = new();
+
+    private void CreateTestamonial()
+    {
+        db.tbl_testamonials.Add(Testamonials);
+        db.SaveChanges();
+        navigationManager.NavigateTo("/Admin/ShowTestamonials");
+    }
+}

@@ -1,0 +1,114 @@
+﻿@page "/Admin/ShowTestamonials"
+@using joblistingsite.Components.Layout
+@using joblistingsite.Data
+@using joblistingsite.Models
+
+@layout AdminLayout
+@inject AppDbContext db
+@rendermode InteractiveServer
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Occupation</th>
+            <th scope="col">Review</th>
+            <th scope="col" colspan="2">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var Testamonials in Testamonials)
+        {
+            <tr>
+
+                <th scope="row">@Testamonials.Id</th>
+                <td>@Testamonials.Name</td>
+                <td>@Testamonials.Occupation</td>
+                <td>@Testamonials.Review</td>
+                <td>
+                    <button type="button" @onclick="@(()=>FindCategory(Testamonials.Id))" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Update
+                    </button>
+                    <button class="btn btn-danger btn-sm" @onclick="(() =>Delete(Testamonials.Id))">Delete</button>
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Category</h5>
+
+            </div>
+            <div class="modal-body">
+                <div class="row justify-content-center">
+                    <div class="col-8 d-flex justfiy-conetent-center">
+                        <EditForm class="row g-3" Enhance=true Model="SelectedTestamonials" FormName="UpdateCategoryForm" OnValidSubmit="Update">
+                            <DataAnnotationsValidator />
+                            <div class="col-6">
+                                <label class="form-label">Name:</label>
+                                <InputText class="form-control" @bind-Value="SelectedTestamonials.Name" />
+                                <ValidationMessage class="text-danger" For="@(()=>SelectedTestamonials.Name)" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Slug:</label>
+                                <InputText class="form-control" @bind-Value="SelectedTestamonials.Occupation" />
+                                <ValidationMessage class="text-danger" For="@(()=>SelectedTestamonials.Occupation)" />
+
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Description:</label>
+                                <InputText class="form-control" @bind-Value="SelectedTestamonials.Review" />
+                                <ValidationMessage class="text-danger" For="@(()=>SelectedTestamonials.Review)" />
+
+                            </div>
+                            <div class="col-12 modal-footer">
+                                <button class="btn btn-primary mt-3" type="submit" data-bs-dismiss="modal"> Update Testamonials</button>
+                            </div>
+
+
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    public IEnumerable<Testamonials> Testamonials{ get; set; }
+
+    [SupplyParameterFromForm]
+    public Testamonials SelectedTestamonials { get; set; } = new();
+    protected override void OnInitialized()
+    {
+        Testamonials = db.tbl_testamonials;
+    }
+
+
+    public void Delete(int Id)
+    {
+        var delete=db.tbl_testamonials.Find(Id);
+        db.tbl_testamonials.Remove(delete);
+        db.SaveChanges();
+    }
+
+    public void FindCategory(int Id)
+    {
+        SelectedTestamonials = db.tbl_testamonials.Find(Id);
+    }
+
+    public void Update()
+    {
+        db.tbl_testamonials.Update(SelectedTestamonials);
+        db.SaveChanges();
+    }
+}

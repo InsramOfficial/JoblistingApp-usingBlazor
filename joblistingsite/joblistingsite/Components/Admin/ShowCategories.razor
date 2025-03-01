@@ -1,0 +1,127 @@
+﻿@page "/Admin/ShowCategories"
+@using joblistingsite.Models
+
+@inject AppDbContext db
+@layout AdminLayout
+<div class="row justify-content-center">
+
+    <div class="col-md-8 d-flex justify-content-center">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th colspan="5">
+                        <h3>Show Categories</h3>
+                    </th>
+                </tr>
+                <tr>
+
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Slug</th>
+                    <th scope="col" colspan="2">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in category)
+                {
+                    <tr>
+                        <th scope="row">@item.Id</th>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>@item.slug</td>
+
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" @onclick="@(()=>FindCategory(item.Id))" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                Update
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" @onclick="@(()=>OnDelete(item.Id))">Delete</button>
+                        </td>
+
+                    </tr>
+                }
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update Category</h5>
+                
+            </div>
+            <div class="modal-body">
+                <div class="row justify-content-center">
+                    <div class="col-8 d-flex justfiy-conetent-center">
+                        <EditForm class="row g-3" Enhance=true Model="SelectedCategory" FormName="UpdateCategoryForm" OnValidSubmit="Update">
+                           <DataAnnotationsValidator/>
+                           <div class="col-6">
+                               <label class="form-label">Name:</label>
+                                <InputText class="form-control" @bind-Value="SelectedCategory.Name" />
+                                <ValidationMessage class="text-danger" For="@(()=>SelectedCategory.Name)" />
+                           </div>
+                           <div class="col-6">
+                               <label class="form-label">Slug:</label>
+                                <InputText class="form-control" @bind-Value="SelectedCategory.slug" />
+                                <ValidationMessage class="text-danger" For="@(()=>SelectedCategory.slug)" />
+
+                           </div>
+                           <div class="col-12">
+                                 <label class="form-label">Description:</label>
+                                <InputText class="form-control" @bind-Value="SelectedCategory.Description" />
+                                <ValidationMessage class="text-danger" For="@(()=>SelectedCategory.Description)" />
+
+                             </div>
+                            <div class="col-12 modal-footer">
+                                <button class="btn btn-primary mt-3" type="submit" data-bs-dismiss="modal"> Update Category</button>
+                            </div>
+
+
+                         </EditForm>  
+                    </div>
+                </div>
+            </div>
+             
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public IEnumerable<Category>category{ get; set; }
+        [SupplyParameterFromForm]
+    public Category SelectedCategory { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        category = db.tbl_category;
+    }
+
+
+    public void OnDelete(int Id)
+    {
+        var CatToDelete = db.tbl_category.Find(Id);
+        db.tbl_category.Remove(CatToDelete);
+        db.SaveChanges();
+    }
+    private void Update()
+    {
+        db.tbl_category.Update(SelectedCategory);
+        db.SaveChanges();
+    }
+    private void FindCategory(int Id)
+    {
+        SelectedCategory = db.tbl_category.Find(Id);
+    }
+
+}
